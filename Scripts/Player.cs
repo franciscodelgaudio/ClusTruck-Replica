@@ -7,8 +7,8 @@ public class Player : MonoBehaviour
 
     [Header("Movement")]
     public float speed = 1f;
-    public float forceJump = 50f, forceImpulse = 20f, velocity;
-    private float jump, impulse; 
+    public float forceJump = 1f;
+    private float velocity;
     public Rigidbody playerRigidbody;
     public PlayerBottomCollider playerBottomCollider;
     private TruckMove truckMove;
@@ -26,18 +26,22 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        MovementMouse();
         PlayerMovement();
     }
 
     void PlayerMovement()
     {
+        PlayerJump();
+        MovementMouse();
         transform.Translate(Vector3.right * Input.GetAxis("Horizontal") * Time.deltaTime * speed);
         transform.Translate(Vector3.forward * Input.GetAxis("Vertical") * Time.deltaTime * speed);
         transform.Translate (Vector3.forward * Time.deltaTime * velocity);
+    }
 
-        playerRigidbody.AddForce(transform.up * jump * Input.GetAxis("Jump"));
-        playerRigidbody.AddForce(transform.forward * impulse * Input.GetAxis("Jump"));
+    void PlayerJump(){
+        if (Input.GetKeyDown(KeyCode.Space) && playerBottomCollider.isTriggerTruck == true){
+            playerRigidbody.AddForce(transform.up * forceJump, ForceMode.Impulse);
+        }
     }
 
     void OnCollisionEnter (Collision other){
@@ -48,17 +52,13 @@ public class Player : MonoBehaviour
     {
         if (playerBottomCollider.isTriggerTruck == true)
         {
-            jump = forceJump;
-            impulse = forceImpulse;
-            transform.SetParent(other.transform);   
+            transform.SetParent(other.transform);  
         }
     }
 
     void OnCollisionExit(Collision other){
         truckMove = other.gameObject.GetComponent<TruckMove>();
         velocity = truckMove.speedAux;
-        jump = 0f;
-        impulse = 0f;
         transform.SetParent(null);
     }
 
