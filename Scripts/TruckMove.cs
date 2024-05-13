@@ -11,7 +11,7 @@ public class TruckMove : MonoBehaviour
     
     [Header("Translation")]
     public float speed = 10f;
-    private float speedAux;
+    public float speedAux;
 
     [Header("Rotation")]
     public float direction = 0f;
