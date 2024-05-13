@@ -4,34 +4,62 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+
     [Header("Movement")]
     public float speed = 1f;
-    public float forceJump = 20f;
-    private float jump;
-    public Rigidbody rigidbody;
+    public float forceJump = 50f, forceImpulse = 20f;
+    private float jump, impulse;
+    public Rigidbody playerRigidbody;
+    public PlayerBottomCollider playerBottomCollider;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    [Header("Camera")]
+    public GameObject player;
+    public GameObject mainCamera;
+    public float sensitivity = 1f;
+    private float mouseX = 0f, mouseY = 0f;
+    
+    void Start(){
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        MovementMouse();
         PlayerMovement();
     }
 
-    void PlayerMovement(){
+    void PlayerMovement()
+    {
         transform.Translate(Vector3.right * Input.GetAxis("Horizontal") * Time.deltaTime * speed);
         transform.Translate(Vector3.forward * Input.GetAxis("Vertical") * Time.deltaTime * speed);
-        rigidbody.AddForce(transform.up * jump * Input.GetAxis("Jump"));
+        playerRigidbody.AddForce(transform.up * jump * Input.GetAxis("Jump"));
+        playerRigidbody.AddForce(transform.forward * impulse * Input.GetAxis("Jump"));
+
+        if (playerBottomCollider.isTriggerTruck == true){
+            jump = forceJump;
+            impulse = forceImpulse;
+        }
+        else{
+            jump = 0f;
+            impulse = 0f;
+            transform.SetParent(null);
+        }
     }
 
-    void OnCollisionStay(Collision other){
-        jump = forceJump;
+    void OnCollisionStay(Collision other)
+    {
+        transform.SetParent(other.transform);    
     }
-    void OnCollisionExit(Collision other){
-        jump = 0f;
+
+    void MovementMouse(){
+        mouseX += Input.GetAxisRaw("Mouse X") * sensitivity;
+        mouseY += Input.GetAxisRaw("Mouse Y") * sensitivity;
+        
+        mouseX = Mathf.Clamp(mouseX, -90f, 90f);
+        mouseY = Mathf.Clamp(mouseY, -90f, 90f);
+
+        mainCamera.transform.localEulerAngles = new Vector3 (-mouseY, 0, 0);
+        player.transform.localEulerAngles = new Vector3 (0, mouseX, 0);
     }
 }

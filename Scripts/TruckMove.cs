@@ -6,11 +6,12 @@ public class TruckMove : MonoBehaviour
 {
 
     [Header("Global")]
-    public float moveTimer = 0f;
-    public float timerDirection = 2f;
+    public float timerDirection = 1f;
+    private float moveTimer = 1f;
     
     [Header("Translation")]
-    public float speed = 1f;
+    public float speed = 10f;
+    private float speedAux;
 
     [Header("Rotation")]
     public float direction = 0f;
@@ -22,25 +23,27 @@ public class TruckMove : MonoBehaviour
         LimitDestroy();
     }
 
-    void ForwardMove(){
+    void ForwardMove()
+    {
         ChangeMovement();
-        transform.Translate (Vector3.forward * Time.deltaTime * speed);
+        transform.Translate (Vector3.forward * Time.deltaTime * speedAux);
         transform.Rotate (Vector3.up, Time.deltaTime * direction * turnSpeed);
     }
 
-    void ChangeMovement(){
+    void ChangeMovement()
+    {
         LimitChangeMovement();
-
-        speed = 1 + Random.Range(1f, 5f);
-
-        moveTimer += Time.deltaTime;
         if (moveTimer >= timerDirection){
-            direction = Random.Range(1f, -1f);
+            direction = Random.Range(0.1f, -0.1f);
+            speedAux = speed + Random.Range(5f, 10f);
             moveTimer = 0;
         }
+        moveTimer += Time.deltaTime;
+
     }
 
-    void LimitChangeMovement (){
+    void LimitChangeMovement ()
+    {
         if (transform.rotation.y < -0.0436194){
             transform.rotation = Quaternion.Euler (0f, -5f, 0f);
         }
@@ -49,8 +52,9 @@ public class TruckMove : MonoBehaviour
         }
     }
 
-    void LimitDestroy (){
-        if (transform.position.z > 130f || transform.position.y < -20f){
+    void LimitDestroy ()
+    {
+        if (transform.position.z > 210f || transform.position.y < -20f){
             Destroy(gameObject);
         }
     }
